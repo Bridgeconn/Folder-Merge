@@ -1,5 +1,4 @@
 # Folder-Merge
-Folder Merge
 This script is structured to organize and merge directories with common prefixes, while handling duplicate chapters.
 ## Features
 

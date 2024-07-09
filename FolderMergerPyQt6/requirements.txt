@@ -1,5 +1,9 @@
+altgraph==0.17.4
 ffmpeg-python==0.2.0
 future==1.0.0
+packaging==24.1
+pyinstaller==6.8.0
+pyinstaller-hooks-contrib==2024.7
 PyQt6==6.7.0
 PyQt6-Qt6==6.7.2
 PyQt6-sip==13.6.0

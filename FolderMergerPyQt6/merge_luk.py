@@ -3,9 +3,7 @@ import shutil
 import ffmpeg
 import subprocess
 
-# base_dir = '/home/sneha/Desktop/Export1'
-# subfolder_name = 'ingredients/LUK'
-# output_dir = os.path.join(base_dir, 'output_luk')
+# To find unique prefixes in the base directory
 
 def find_unique_prefixes(base_dir):
     unique_prefixes = set()
@@ -16,6 +14,9 @@ def find_unique_prefixes(base_dir):
             unique_prefixes.add(item[:3].upper())
    
     return list(unique_prefixes)
+
+
+# To find directories in the base directory that start with a given prefix
 
 def find_dirs_with_prefix(base_dir, prefix):
     
@@ -30,6 +31,7 @@ def find_dirs_with_prefix(base_dir, prefix):
     
     return dirs_with_prefix
 
+#To find subdirectories within a specified subfolder
 def find_source_dirs(base_dir, subfolder_name):
     source_dirs = []
     base_subfolder = os.path.join(base_dir, subfolder_name)
@@ -43,6 +45,7 @@ def find_source_dirs(base_dir, subfolder_name):
    
     return source_dirs
 
+#Copy files from source directory to destination directory
 def copy_files(src, dest):
     file_count = 0
     for root, dirs, files in os.walk(src):
@@ -53,6 +56,7 @@ def copy_files(src, dest):
             if not os.path.exists(dest_dir):
                 os.makedirs(dest_dir)
 
+            #convert the files to mp3
             if file.lower().endswith('.mp3'):
                 src_format = check_file_format(src_file)
                 # print(f"The format of the source file is {src_format}")
@@ -67,28 +71,31 @@ def copy_files(src, dest):
             shutil.copy2(src_file, dest_file)
             file_count += 1
     return file_count
+
+#To check the file format using ffprobe
 def check_file_format(file_path):
     result = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=format_name', '-of', 'default=noprint_wrappers=1:nokey=1', file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return result.stdout.decode().strip()
 
-
+#Count the number of chapters in the output directory
 def count_chapters(prefix, output_dir):
     luk_dir = os.path.join(output_dir, f'Merged/{prefix}/LUK')
     if not os.path.exists(luk_dir):
         return 0
 
     chapters = [chapter for chapter in os.listdir(luk_dir) if os.path.isdir(os.path.join(luk_dir, chapter))]
-    return len(chapters)
+    return (chapters)
 
+#count the no of chapters in the specific chapter directory
 def count_files_in_chapter(prefix, chapterno, output_dir):
     chapter_dir = os.path.join(output_dir, f'Merged/{prefix}/LUK/{chapterno}')
     if not os.path.exists(chapter_dir):
         return 0
 
     files = [file for file in os.listdir(chapter_dir) if os.path.isfile(os.path.join(chapter_dir, file))]
-    print("len of files is -----------------------------------",len(files))
     return len(files)
 
+#check duplicate chapters across directories with the same prefix
 def check_for_duplicates(prefix, subfolder_name,dirs_with_prefix):
     chapter_tracker = {}
     
@@ -111,7 +118,7 @@ def check_for_duplicates(prefix, subfolder_name,dirs_with_prefix):
    
     return duplicates
 
-
+#function to merge folders
 def merge_folders(base_dir, subfolder_name, output_dir):
 
     merge_results=[]
@@ -148,15 +155,19 @@ def merge_folders(base_dir, subfolder_name, output_dir):
     
     
                 dest_dir = os.path.join(target_base_dir, chapterno)
+
+                if os.path.commonpath([src_dir, output_dir]) == output_dir:
+                    continue
                 
                 file_count = copy_files(src_dir, dest_dir)
                 chapter_counts[prefix] += 1 
     
     print("Files merged successfully!")
     for prefix in unique_prefixes:
-        total_chapters = count_chapters(prefix, output_dir)
+        chapters = count_chapters(prefix, output_dir)
+        total_chapters=len(chapters)
         merge_results.append((f"{prefix}: {total_chapters} chapters"))
-        for chapterno in range(1, total_chapters + 1):
+        for chapterno in chapters:
             chapter_files_count = count_files_in_chapter(prefix, str(chapterno), output_dir)
             merge_results.append(f"  Chapter {chapterno}: {chapter_files_count} files")
     

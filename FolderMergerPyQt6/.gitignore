@@ -1,0 +1,7 @@
+
+__pycache__/
+
+pyqt-env/
+dist/
+*.spec
+build/

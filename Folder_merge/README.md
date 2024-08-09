@@ -32,23 +32,34 @@ A utility module to merge folders based on unique prefixes and convert files to 
 3.  Create and activate virtual environment.
 
     - On Windows:
-      python -m venv venv
-      venv\Scripts\activate
+      python -m venv env.
+
+      env\Scripts\activate(git bash or similar environments)
+
+      env\Scripts\Activate.ps1(Powershell)
+
+      env\Scripts\activate.bat(cmd.exe)
 
     - On macOS/Linux:
-      python3 -m venv venv
-      source venv/bin/activate
+
+      python3 -m venv env.
+
+      source env/bin/activate
 
 4.  Install the required python dependencies:
+
     pip install -r requirements.txt
 
 5.  Install ffmpeg:
+
     For windows,download and install ffmpeg from FFmpeg website.
 
     For Ubuntu/Linux:
+
     sudo apt install ffmpeg.
 
 6.  Install ffmpeg-python:
+
     pip install ffmpeg-python
 
 ## Run the application:

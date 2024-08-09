@@ -39,7 +39,7 @@ A utility module to merge folders based on unique prefixes and convert files to 
       python3 -m venv venv
       source venv/bin/activate
 
-4.  Install the required python dependencies
+4.  Install the required python dependencies:
     pip install -r requirements.txt
 
 5.  Install ffmpeg:

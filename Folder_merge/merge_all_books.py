@@ -2,6 +2,8 @@ import os
 import shutil
 import ffmpeg
 import subprocess
+import glob
+import json
 
 # To find unique prefixes of directories in the base directory.
 
@@ -104,6 +106,7 @@ def check_for_duplicates(prefix, subfolder_name, dirs_with_prefix):
 # To  merge folders based on unique prefixes
 
 def merge_folders(base_dir, subfolder_name, output_dir):
+    print(base_dir, subfolder_name)
     merge_results = []
     unique_prefixes = find_unique_prefixes(base_dir)
     chapter_counts = {prefix: 0 for prefix in unique_prefixes}
@@ -174,6 +177,84 @@ def merge_folders(base_dir, subfolder_name, output_dir):
 
     return merge_results
 
+
+
+#merge JSON files.
+def merge_json_files(base_dir,outputdir,output_filename):
+    print('Merging json files')
+    #print(outputdir)
+  
+    temp_userName = []
+    temp_currentscope = []
+    c_scope_merged_dict = {}
+    temp_localizedNames = []
+    localizedNames_merged_dict = {"localizedNames": {}}
+    temp_ingredients = []
+    ingredients_merged_dict = {"ingredients": {}}
+
+    folderlst = glob.glob(base_dir+"/*")
+    for folder in sorted(folderlst):
+        jsonfiles = glob.glob(folder+'/*.json')
+        if not jsonfiles: 
+            print(f"No JSON files found in {folder}. Skipping.")
+            continue
+
+        with open(jsonfiles[0], 'r') as file1:
+            data1 = json.load(file1)
+            tempjson = data1
+            userName = data1['meta']['generator']['userName']
+            print(userName)
+            if userName not in temp_userName:
+                temp_userName.append(userName)
+            
+            currentScope =data1['type']['flavorType']['currentScope']
+            temp_currentscope.append(currentScope)
+
+            ingredients =data1['ingredients']
+
+            temp_ingredients.append({"ingredients": ingredients})
+    
+            localizedNames =data1['localizedNames']
+     
+            temp_localizedNames.append({"localizedNames": localizedNames})
+     
+    for d in temp_currentscope:
+        for key, values in d.items():
+            c_scope_merged_dict.setdefault(key, set()).update(values)
+    c_scope_merged_dict = {key: sorted(value) for key, value in c_scope_merged_dict.items()}
+    
+    for i in c_scope_merged_dict:
+        ordered_values = sorted(c_scope_merged_dict[i], key=int)
+        c_scope_merged_dict[i]= ordered_values
+     
+    for dictingredients in temp_ingredients:
+    
+        for key, value in dictingredients.get("ingredients", {}).items():
+            if key not in ingredients_merged_dict["ingredients"]:
+                ingredients_merged_dict["ingredients"][key] = value
+                #print(ingredients_merged_dict)
+    
+    for dictNames in temp_localizedNames:
+    
+        for key, value in dictNames.get("localizedNames", {}).items():
+
+            if key not in localizedNames_merged_dict["localizedNames"]:
+                localizedNames_merged_dict["localizedNames"][key] = value
+                #print(ingredients_merged_dict)            
+    
+    tempjson['meta']['generator']['userName'] = temp_userName
+    tempjson['localizedNames'] = localizedNames_merged_dict['localizedNames']
+    tempjson['type']['flavorType']['currentScope'] = c_scope_merged_dict
+    tempjson['ingredients'] = ingredients_merged_dict['ingredients']
+    
+    filepath_out = f'{outputdir}/{output_filename}'
+    with open(filepath_out, 'w') as file1:
+        json.dump(tempjson, file1, indent=4)
+        
+    print("jason file created.")
+     
+
+     
 # To convert files to mp3
 
 def convert_to_mp3(output_dir):
@@ -190,6 +271,7 @@ def convert_to_mp3(output_dir):
             ffmpeg.input(src_file).output(dest_file).run()
             file_format = check_file_format(dest_file)
             print(f"file_format after conversion {file_format}")
+
 
 # To check the file format of a specific file
 

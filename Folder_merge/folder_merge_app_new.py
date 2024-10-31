@@ -26,13 +26,17 @@ class FolderMergerThread(QThread):
 
         try:
             results=merge_all_books.merge_folders(self.base_dir,self.sub_folder,self. output_dir)
+            #print('test line--------------------')
+
+            # Merge JSON files
+            merge_all_books.merge_json_files(self.base_dir,self.output_dir,"metadata.json")
 
             # simulate progress update
             for i in range(1,101):
                
                 time.sleep(0.05)
                 self.update_progress.emit(i)
-            self.task_completed.emit("Folders merged successfully!\nThe merged folders can be found in the Output folder within the Source directory.\nReports are written in report.txt'")
+            self.task_completed.emit("Folders and JSON merged successfully!\nThe merged folders can be found in the Output folder within the Source directory.\nReports are written in report.txt'")
             # convert=merge.convert_to_mp3(self.output_dir)
         
         
@@ -54,6 +58,7 @@ class FileconversionThread(QThread):
         try:
 
             converted_result = merge_all_books.convert_to_mp3(self.output_dir)
+
 
             for i in range(1,101):
                 time.sleep(0.05)

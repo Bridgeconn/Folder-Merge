@@ -180,11 +180,11 @@ def merge_folders(base_dir, subfolder_name, output_dir):
 
 
 #merge JSON files.
-def merge_json_files(base_dir,outputdir,output_filename):
+def merge_json_files(base_dir,outputdir,userNamedata,output_filename):
     print('Merging json files')
     #print(outputdir)
   
-    temp_userName = []
+    #temp_userName = []
     temp_currentscope = []
     c_scope_merged_dict = {}
     temp_localizedNames = []
@@ -204,8 +204,8 @@ def merge_json_files(base_dir,outputdir,output_filename):
             tempjson = data1
             userName = data1['meta']['generator']['userName']
             print(userName)
-            if userName not in temp_userName:
-                temp_userName.append(userName)
+            #if userName not in temp_userName:
+            #    temp_userName.append(userName)
             
             currentScope =data1['type']['flavorType']['currentScope']
             temp_currentscope.append(currentScope)
@@ -242,7 +242,8 @@ def merge_json_files(base_dir,outputdir,output_filename):
                 localizedNames_merged_dict["localizedNames"][key] = value
                 #print(ingredients_merged_dict)            
     
-    tempjson['meta']['generator']['userName'] = temp_userName
+    #tempjson['meta']['generator']['userName'] = temp_userName
+    tempjson['meta']['generator']['userName'] = userNamedata
     tempjson['localizedNames'] = localizedNames_merged_dict['localizedNames']
     tempjson['type']['flavorType']['currentScope'] = c_scope_merged_dict
     tempjson['ingredients'] = ingredients_merged_dict['ingredients']

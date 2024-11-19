@@ -1,0 +1,3 @@
+run this in terminal
+
+./folder_merge_app_new

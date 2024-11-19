@@ -168,10 +168,13 @@ class FolderMergeApp(QWidget):
         self.convert_thread.task_completed.connect(self.on_task_completed)
         self.convert_thread.start()
 
-    def on_task_completed(self, message):
+    def on_task_completed(self,message):
         self.progress_dialog.close()
-        QMessageBox.information(self, 'Success', message)
-
+        try:
+            QMessageBox.information(self, 'Success',message)
+        except Exception as e:
+            QMessageBox.critical(self, 'Error',message)
+       
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = FolderMergeApp()

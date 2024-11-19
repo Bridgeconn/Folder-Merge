@@ -67,7 +67,7 @@ def copy_files(src, dest):
 # To count chapters in a specific book
 
 def count_chapters(prefix, book, output_dir):
-    luk_dir = os.path.join(output_dir, f'Merged_without_conversion/{prefix}/{book}')
+    luk_dir = os.path.join(output_dir, f'Merged_without_conversion/{prefix}/ingredients/{book}')
     if not os.path.exists(luk_dir):
         return 0
     chapters = [chapter for chapter in os.listdir(luk_dir) if os.path.isdir(os.path.join(luk_dir, chapter))]
@@ -77,7 +77,7 @@ def count_chapters(prefix, book, output_dir):
 # To count files in a specific chapter
 
 def count_files_in_chapter(prefix, book, chapterno, output_dir):
-    chapter_dir = os.path.join(output_dir, f'Merged_without_conversion/{prefix}/{book}/{chapterno}')
+    chapter_dir = os.path.join(output_dir, f'Merged_without_conversion/{prefix}/ingredients/{book}/{chapterno}')
     if not os.path.exists(chapter_dir):
         return 0
     files = [file for file in os.listdir(chapter_dir) if os.path.isfile(os.path.join(chapter_dir, file))]
@@ -104,15 +104,17 @@ def check_for_duplicates(prefix, subfolder_name, dirs_with_prefix):
     return duplicates
 
 # To  merge folders based on unique prefixes
+target_base_dir = None
 
 def merge_folders(base_dir, subfolder_name, output_dir):
+    global target_base_dir 
     print(base_dir, subfolder_name)
     merge_results = []
     unique_prefixes = find_unique_prefixes(base_dir)
     chapter_counts = {prefix: 0 for prefix in unique_prefixes}
 
     for prefix in unique_prefixes:
-        target_base_dir = os.path.join(output_dir, f'Merged_without_conversion/{prefix}')
+        target_base_dir = os.path.join(output_dir, f'Merged_without_conversion/{prefix}/ingredients')
         if not os.path.exists(target_base_dir):
             os.makedirs(target_base_dir)
         
@@ -162,7 +164,7 @@ def merge_folders(base_dir, subfolder_name, output_dir):
     
     print("Files merged successfully!")
     for prefix in unique_prefixes:
-        for book in find_book(os.path.join(output_dir, f'Merged_without_conversion/{prefix}')):
+        for book in find_book(os.path.join(output_dir, f'Merged_without_conversion/{prefix}/ingredients')):
             chapters = count_chapters(prefix, book, output_dir)
             total_chapters = len(chapters)
             merge_results.append(f"{prefix} - {book}: {total_chapters} chapters")
@@ -248,7 +250,9 @@ def merge_json_files(base_dir,outputdir,userNamedata,output_filename):
     tempjson['type']['flavorType']['currentScope'] = c_scope_merged_dict
     tempjson['ingredients'] = ingredients_merged_dict['ingredients']
     
-    filepath_out = f'{outputdir}/{output_filename}'
+    #filepath_out = f'{outputdir}/{output_filename}'
+    ingredients_level_path = os.path.join(target_base_dir, '..')  # Moves one level up from 'ingredients'
+    filepath_out = f'{ingredients_level_path}/{output_filename}'
     with open(filepath_out, 'w') as file1:
         json.dump(tempjson, file1, indent=4)
         
@@ -259,7 +263,7 @@ def merge_json_files(base_dir,outputdir,userNamedata,output_filename):
 # To convert files to mp3
 
 def convert_to_mp3(output_dir):
-    merged_dir = os.path.join(output_dir, "Merged_without_conversion")
+    merged_dir = os.path.join(output_dir, "Merged_without_conversion", "ingredients")
     converted_dir = os.path.join(output_dir, "Merged and Converted")
     for root, dirs, files in os.walk(merged_dir):
         for file in files:
